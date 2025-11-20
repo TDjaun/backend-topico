@@ -9,4 +9,4 @@ export class DashboardController {
     async getTopicoDashboard(): Promise<DashboardData> { 
         return this.dashboardService.getDashboardData();
     }
-}
+} 
