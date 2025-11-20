@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AtencionesService } from '../atenciones/atenciones.service'; 
+import { AtencionesService } from '../atenciones/atenciones.service';
 import { IncidenciasService } from '../inicidencias/incidencias.service';
 import { InventarioService } from '../inventario/inventario.service';
 import { EstudiantesService } from '../estudiantes/estudiantes.service';
@@ -22,7 +22,8 @@ export interface DashboardData {
     resumenOperacional: ResumenOperacional;
     lineaDeTiempo: TimelineEvent[];
 }
-Injectable()
+
+@Injectable()
 export class DashboardService {
     constructor(
         private readonly atencionesService: AtencionesService,
@@ -33,24 +34,25 @@ export class DashboardService {
 
     async getDashboardData(): Promise<DashboardData> {
         const today = new Date();
-        today.setHours(0, 0, 0, 0); 
-        
-        const last7Days = new Date();
-        last7Days.setDate(last7Days.getDate() - 7); 
-        last7Days.setHours(0, 0, 0, 0); 
+        today.setHours(0, 0, 0, 0);
 
-        const atencionesHoy = await this.atencionesService.countAtencionesSince(today); 
+        const last7Days = new Date();
+        last7Days.setDate(last7Days.getDate() - 7);
+        last7Days.setHours(0, 0, 0, 0);
+
+        const atencionesHoy = await this.atencionesService.countAtencionesSince(today);
         const stockTotal = await this.inventarioService.sumTotalStock();
         const incidencias7Dias = await this.incidenciasService.countIncidenciasSince(last7Days);
-        const umbralStockMinimo = 10; 
-        const alertasStockMinimo = await this.inventarioService.countStockAlerts(umbralStockMinimo); 
-        const latestAtenciones = await this.atencionesService.getLatestEvents(3); 
+
+        const umbralStockMinimo = 10;
+        const alertasStockMinimo = await this.inventarioService.countStockAlerts(umbralStockMinimo);
+
+        const latestAtenciones = await this.atencionesService.getLatestEvents(3);
         const latestIncidencias = await this.incidenciasService.getLatestEvents(2);
 
-        
         const atencionesTimeline: TimelineEvent[] = latestAtenciones.map(att => ({
             tipo: 'Atención Médica',
-            descripcion: `Atención a ${att.estudianteNombre} completada.`, 
+            descripcion: `Atención a ${att.estudianteNombre} completada.`,
             detalle: `Causa: ${att.sintomas || att.tipo_atencion}`,
             fechaHora: new Date(att.fecha_hora_atencion),
         }));
