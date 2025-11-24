@@ -6,6 +6,7 @@ import {
   BadRequestException,
   Get,
   Query,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { EstudiantesService } from './estudiantes.service';
@@ -28,10 +29,25 @@ export class EstudiantesController {
     const worksheet = workbook.Sheets[sheetName];
     const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-    const { inserted, skipped, conflicts } =
+    const { inserted, conflicts } =
       await this.estudiantesService.importarDesdeArray(json);
 
-    return { inserted, skipped, conflicts };
+    return {
+      inserted,
+      conflicts,
+      skipped: conflicts.length,
+    };
+  }
+
+  @Post('resolver-conflictos')
+  async resolverConflictos(
+    @Body('action') action: 'sobrescribir' | 'ignorar',
+    @Body('items') items: any[],
+  ) {
+    if (!action || !items || !Array.isArray(items)) {
+      throw new BadRequestException('Acción o lista de elementos inválida');
+    }
+    return this.estudiantesService.resolverConflictos(action, items);
   }
 
   @Get('buscar')

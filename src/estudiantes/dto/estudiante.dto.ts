@@ -5,7 +5,7 @@ export class EstudianteDto {
   apellidos!: string;
   grado!: string;
   seccion!: string;
-  fecha_nacimiento?: string;
+  fecha_nacimiento?: string | null;
   sexo?: string;
   direccion?: string;
   contacto_apoderado?: string;
